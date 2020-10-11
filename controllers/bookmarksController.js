@@ -101,56 +101,56 @@ exports.checkData = (req, res, next) => {
   );
 
   if (!title) {
-    return res.json({
+    return res.status(400).json({
       success: false,
       message: 'You must provide a title'
     });
   }
 
   if (!url) {
-    return res.json({
+    return res.status(400).json({
       success: false,
       message: 'You must provide a URL'
     });
   }
 
   if (title.trim().length < 1) {
-    return res.json({
+    return res.status(400).json({
       success: false,
       message: 'You must provide a title length greater than 1'
     });
   }
 
   if (url.trim().length <= 5) {
-    return res.json({
+    return res.status(400).json({
       success: false,
       message: 'You must provide a URL length greater than 1'
     });
   }
 
   if (!protocolPattern.test(url)) {
-    return res.json({
+    return res.status(400).json({
       success: false,
       message: 'You must provide a protocol in your URL'
     });
   }
 
   if (!pattern.test(url)) {
-    return res.json({
+    return res.status(400).json({
       success: false,
       message: 'You must provide a properly formatted URL'
     });
   }
 
   if (desc && desc.trim().length < 1) {
-    return res.json({
+    return res.status(400).json({
       success: false,
       message: 'You must provide a description length greater than 1'
     });
   }
 
   if (rating && (rating < 1 || rating > 5)) {
-    return res.json({
+    return res.status(400).json({
       success: false,
       message: 'You must provide a rating between 1 and 5'
     });
