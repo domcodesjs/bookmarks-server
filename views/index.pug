@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(name="description", content="Add bookmarks to your favorite websites!")
+    meta(name="keywords" content="HTML, CSS, JavaScript, Bookmarks")
+    title Bookmarks API
+    link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css")
+    link(rel="stylesheet", href="./styles/main.css")
+  body
+    header
+      h1 Bookmarks API
+    main
+      ul
+        li @GET /bookmarks (retrieves all bookmarks)
+        li @GET /bookmarks/:id (retrievesbookmark)
+        li @POST /bookmarks/:id (creates a bookmark)
+        li @DELETE /bookmarks/:id (deletes a bookmark)
+      p You must have a valid API key attached as an x-api-key header to hit these endpoints. 
