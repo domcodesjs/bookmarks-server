@@ -3,8 +3,14 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
-const bookmarksRoutes = require('./routes/bookmarksRoutes');
+const mongoose = require('mongoose');
 const app = express();
+
+require('./models/Bookmark');
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
 app.use(cors());
 app.use(morgan('tiny'));
@@ -12,7 +18,7 @@ app.use(morgan('tiny'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use('/bookmarks', bookmarksRoutes);
+app.use('/bookmarks', require('./routes/bookmarksRoutes'));
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
