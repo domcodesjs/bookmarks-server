@@ -27,16 +27,30 @@ main {
   margin: 0 auto;
 }
 
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
 h1,
 ul,
 p {
   margin: 0;
 }
 
+h1,
+h2 {
+  text-align: center;
+}
+
 ul {
   padding: 0;
   list-style: none;
   margin-top: 2.4rem;
+}
+
+li {
+  text-align: center;
 }
 
 li:not(:first-child) {
@@ -46,4 +60,5 @@ li:not(:first-child) {
 p {
   margin-top: 1.6rem;
   font-size: 1.4rem;
+  text-align: center;
 }

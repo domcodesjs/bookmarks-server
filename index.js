@@ -27,7 +27,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/', require('./routes'));
 app.use('/bookmarks', require('./routes/bookmarksRoutes'));
 app.get('*', (req, res) => {
-  return res.render('index');
+  return res.render('404');
 });
 
 const port = process.env.PORT || 5000;
