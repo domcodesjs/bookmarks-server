@@ -89,6 +89,8 @@ exports.deleteBookmark = async (req, res) => {
 };
 
 exports.checkData = (req, res, next) => {
+  // I looked up validatorjs and it looks like it could've just used that here but
+  // I felt for something so small it wasn't necessary
   const { title, url, desc, rating } = req.body;
   const protocolPattern = new RegExp('^(https?:\\/\\/)');
   const pattern = new RegExp(
