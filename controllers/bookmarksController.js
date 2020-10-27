@@ -1,31 +1,84 @@
-const { getBookmarks, getBookmark } = require('../services/bookmarksService');
+const {
+  getBookmarks,
+  getBookmark,
+  createBookmark,
+  deleteBookmark
+} = require('../services/bookmarksService');
 
 exports.getBookmarks = async (req, res) => {
-  const db = req.app.get('db');
-  const bookmarks = await getBookmarks(db);
+  try {
+    const db = req.app.get('db');
+    const bookmarks = await getBookmarks(db);
 
-  res.json({ success: true, bookmarks });
+    res.json({ success: true, bookmarks });
+  } catch (err) {
+    res.json({
+      success: false,
+      message: 'Could not get bookmarks'
+    });
+  }
 };
 
 exports.getBookmark = async (req, res) => {
-  const db = req.app.get('db');
-  const { id } = req.params;
+  try {
+    const db = req.app.get('db');
+    const { id } = req.params;
 
-  const bookmark = await getBookmark(db, id);
+    const bookmark = await getBookmark(db, id);
 
-  if (!bookmark) {
-    return res.status(404).json({
+    if (!bookmark) {
+      return res.status(400).json({
+        success: false,
+        message: 'Bookmark does not exist'
+      });
+    }
+
+    res.json({ success: true, bookmark });
+  } catch (err) {
+    res.status(500).json({
       success: false,
-      message: 'Bookmark does not exist'
+      message: 'Could not get bookmark'
     });
   }
-
-  res.json({ success: true, bookmark });
 };
 
-exports.addBookmark = async (req, res) => {};
+exports.addBookmark = async (req, res) => {
+  try {
+    const db = req.app.get('db');
+    const newBookmark = await createBookmark(db, req.body);
+    res.status(201).json({
+      success: true,
+      bookmark: newBookmark
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'Could not create bookmark'
+    });
+  }
+};
 
-exports.deleteBookmark = async (req, res) => {};
+exports.deleteBookmark = async (req, res) => {
+  try {
+    const db = req.app.get('db');
+    const { id } = req.params;
+    const deletedBookmark = await deleteBookmark(db, id);
+
+    if (!deletedBookmark) {
+      return res.status(400).json({
+        success: false,
+        message: 'You cannot delete a bookmark that does not exist'
+      });
+    }
+
+    res.json({ success: true, deletedBookmark });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'Could not delete bookmark'
+    });
+  }
+};
 
 exports.checkData = (req, res, next) => {
   const { title, url, description, rating } = req.body;

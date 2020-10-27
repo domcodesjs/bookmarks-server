@@ -10,8 +10,10 @@ exports.getBookmark = async (db, id) => {
   return bookmarks;
 };
 
-exports.createBookmark = (db, newBookmark) => {};
+exports.createBookmark = async (db, newBookmark) => {
+  return (await db(table).insert(newBookmark).returning('*'))[0];
+};
 
-exports.updateBookmark = (db, updatedBookmark) => {};
-
-exports.deleteBookmark = (db, id) => {};
+exports.deleteBookmark = async (db, id) => {
+  return (await db(table).where({ id }).delete().returning('*'))[0];
+};

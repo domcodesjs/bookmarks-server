@@ -53,10 +53,48 @@ describe('Articles Endpoints', function () {
           return expect(body.bookmark).to.eql(testBookmarks[0]);
         });
     });
+
+    it('Creates an article, responding with 201 and the new bookmark', () => {
+      return supertest(app)
+        .post('/bookmarks')
+        .set('x-api-key', process.env.API_KEY)
+        .send({
+          id: 11,
+          title: 'Bookmark 1',
+          url: 'https://www.google.com',
+          description: 'adsfasdfasdf',
+          rating: 5
+        })
+        .expect(201)
+        .then(({ body }) => {
+          expect(body).to.be.an('object');
+          expect(body).to.haveOwnProperty('bookmark');
+          return expect(body.bookmark).to.eql({
+            id: 11,
+            title: 'Bookmark 1',
+            url: 'https://www.google.com',
+            description: 'adsfasdfasdf',
+            rating: 5
+          });
+        });
+    });
+
+    it('Deletes an article responding with 200 and deleted bookmark', () => {
+      return supertest(app)
+        .delete('/bookmarks/1')
+        .set('x-api-key', process.env.API_KEY)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).to.be.an('object');
+          expect(body).to.be.haveOwnProperty('deletedBookmark');
+          const expected = testBookmarks[0];
+          return expect(body.deletedBookmark).to.eql(expected);
+        });
+    });
   });
 
   context('Given there are no bookmarks in the bookmarks table', () => {
-    it('@GET /bookmarks responds an empty array', () => {
+    it('@GET /bookmarks responds with an empty array', () => {
       return supertest(app)
         .get('/bookmarks')
         .set('x-api-key', process.env.API_KEY)
