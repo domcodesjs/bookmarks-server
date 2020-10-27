@@ -10,9 +10,16 @@ exports.getBookmarks = async (req, res) => {
     const db = req.app.get('db');
     const bookmarks = await getBookmarks(db);
 
+    if (!bookmarks) {
+      return res.status(400).json({
+        success: false,
+        message: 'Could not get bookmarks'
+      });
+    }
+
     res.json({ success: true, bookmarks });
   } catch (err) {
-    res.json({
+    res.status(500).json({
       success: false,
       message: 'Could not get bookmarks'
     });
