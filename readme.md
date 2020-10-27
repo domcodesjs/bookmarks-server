@@ -12,3 +12,8 @@ You'll need an API key to use the API link I posted above or you'll get access d
 - @GET /bookmarks/:id (retrievesbookmark)
 - @POST /bookmarks/:id (creates a bookmark)
 - @DELETE /bookmarks/:id (deletes a bookmark)
+
+### SEED DB
+
+`psql -U dunder_mifflin -d bookmarks -f ./seeds/seed.bookmarks.sql`
+`psql -U dunder_mifflin -d bookmarks-test -f ./seeds/seed.bookmarks.sql`

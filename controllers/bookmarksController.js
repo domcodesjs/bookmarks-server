@@ -1,97 +1,34 @@
-const mongoose = require('mongoose');
-const Bookmark = mongoose.model('Bookmark');
-const { nanoid } = require('nanoid');
+const { getBookmarks, getBookmark } = require('../services/bookmarksService');
 
 exports.getBookmarks = async (req, res) => {
-  try {
-    const bookmarks = await Bookmark.find().select('-_id');
-    return res.json({
-      success: true,
-      messsage: 'Successfully retrieved bookmarks',
-      bookmarks
-    });
-  } catch (err) {
-    return res.status(400).json({
-      success: false,
-      messsage: 'Your request failed.'
-    });
-  }
-};
+  const db = req.app.get('db');
+  const bookmarks = await getBookmarks(db);
 
-exports.addBookmark = async (req, res) => {
-  try {
-    const bookmark = new Bookmark(req.body);
-    bookmark.id = nanoid();
-    await bookmark.save();
-    // omit _id from being sent to the front end
-    const { _id, ...restOfBookmark } = bookmark._doc;
-    return res.json({
-      success: true,
-      messsage: 'Successfully added bookmark',
-      bookmark: restOfBookmark
-    });
-  } catch (err) {
-    return res.status(400).json({
-      success: false,
-      messsage: 'Your request failed.'
-    });
-  }
+  res.json({ success: true, bookmarks });
 };
 
 exports.getBookmark = async (req, res) => {
-  try {
-    const bookmark = await Bookmark.findOne({ id: req.params.id }).select(
-      '-_id'
-    );
+  const db = req.app.get('db');
+  const { id } = req.params;
 
-    if (!bookmark) {
-      return res.status(404).json({
-        success: false,
-        messsage: 'Bookmark does not exist'
-      });
-    }
+  const bookmark = await getBookmark(db, id);
 
-    return res.json({
-      success: true,
-      messsage: 'Successfully retrieved bookmark',
-      bookmark: bookmark
-    });
-  } catch (err) {
-    return res.status(400).json({
+  if (!bookmark) {
+    return res.status(404).json({
       success: false,
-      messsage: 'Your request failed.'
+      message: 'Bookmark does not exist'
     });
   }
+
+  res.json({ success: true, bookmark });
 };
 
-exports.deleteBookmark = async (req, res) => {
-  try {
-    const bookmark = await Bookmark.findOneAndDelete({ id: req.params.id });
+exports.addBookmark = async (req, res) => {};
 
-    if (!bookmark) {
-      return res.status(404).json({
-        success: false,
-        messsage: "You can't delete a bookmark that doesn't exist"
-      });
-    }
-
-    return res.json({
-      success: true,
-      messsage: 'Successfully deleted bookmark',
-      id: bookmark.id
-    });
-  } catch (err) {
-    return res.status(400).json({
-      success: false,
-      messsage: 'Your request failed.'
-    });
-  }
-};
+exports.deleteBookmark = async (req, res) => {};
 
 exports.checkData = (req, res, next) => {
-  // I looked up validatorjs and it looks like it could've just used that here but
-  // I felt for something so small it wasn't necessary
-  const { title, url, desc, rating } = req.body;
+  const { title, url, description, rating } = req.body;
   const protocolPattern = new RegExp('^(https?:\\/\\/)');
   const pattern = new RegExp(
     '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
@@ -144,14 +81,21 @@ exports.checkData = (req, res, next) => {
     });
   }
 
-  if (desc && desc.trim().length < 1) {
+  if (description && description.trim().length < 1) {
     return res.status(400).json({
       success: false,
       message: 'You must provide a description length greater than 1'
     });
   }
 
-  if (rating && (rating < 1 || rating > 5)) {
+  if (!rating) {
+    return res.status(400).json({
+      success: false,
+      message: 'You must provide a rating'
+    });
+  }
+
+  if (rating < 1 || rating > 5) {
     return res.status(400).json({
       success: false,
       message: 'You must provide a rating between 1 and 5'
