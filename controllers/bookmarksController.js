@@ -2,7 +2,8 @@ const {
   getBookmarks,
   getBookmark,
   createBookmark,
-  deleteBookmark
+  deleteBookmark,
+  updateBookmark
 } = require('../services/bookmarksService');
 
 exports.getBookmarks = async (req, res) => {
@@ -61,6 +62,47 @@ exports.addBookmark = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Could not create bookmark'
+    });
+  }
+};
+
+exports.updateBookmark = async (req, res) => {
+  try {
+    const db = req.app.get('db');
+    const { title, url, description, rating } = req.body;
+    const { id } = req.params;
+    let bookmark = {};
+
+    if (title) {
+      bookmark['title'] = title;
+    }
+
+    if (url) {
+      bookmark['url'] = url;
+    }
+
+    if (description) {
+      bookmark['description'] = description;
+    }
+
+    if (rating) {
+      bookmark['rating'] = rating;
+    }
+
+    const updatedBookmark = await updateBookmark(db, id, bookmark);
+
+    if (!updatedBookmark) {
+      return res.status(400).json({
+        success: false,
+        message: 'Could not update bookmark'
+      });
+    }
+
+    res.status(200).json({ success: true, updatedBookmark });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'Could not update bookmark'
     });
   }
 };
@@ -156,6 +198,63 @@ exports.checkData = (req, res, next) => {
   }
 
   if (rating < 1 || rating > 5) {
+    return res.status(400).json({
+      success: false,
+      message: 'You must provide a rating between 1 and 5'
+    });
+  }
+
+  next();
+};
+
+exports.checkUpdatedData = (req, res, next) => {
+  const { title, url, description, rating } = req.body;
+  const protocolPattern = new RegExp('^(https?:\\/\\/)');
+  const pattern = new RegExp(
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
+      '((\\d{1,3}\\.){3}\\d{1,3}))' +
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
+      '(\\?[;&a-z\\d%_.~+=-]*)?' +
+      '(\\#[-a-z\\d_]*)?$',
+    'i'
+  );
+
+  if (title && title.trim().length < 1) {
+    return res.status(400).json({
+      success: false,
+      message: 'You must provide a title length greater than 1'
+    });
+  }
+
+  if (url && url.trim().length <= 5) {
+    return res.status(400).json({
+      success: false,
+      message: 'You must provide a URL length greater than 1'
+    });
+  }
+
+  if (url && !protocolPattern.test(url)) {
+    return res.status(400).json({
+      success: false,
+      message: 'You must provide a protocol in your URL'
+    });
+  }
+
+  if (url && !pattern.test(url)) {
+    return res.status(400).json({
+      success: false,
+      message: 'You must provide a properly formatted URL'
+    });
+  }
+
+  if (description && description.trim().length < 1) {
+    return res.status(400).json({
+      success: false,
+      message: 'You must provide a description length greater than 1'
+    });
+  }
+
+  if (rating && (rating < 1 || rating > 5)) {
     return res.status(400).json({
       success: false,
       message: 'You must provide a rating between 1 and 5'

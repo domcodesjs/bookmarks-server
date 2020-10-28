@@ -14,6 +14,12 @@ exports.createBookmark = async (db, newBookmark) => {
   return (await db(table).insert(newBookmark).returning('*'))[0];
 };
 
+exports.updateBookmark = async (db, id, updatedBookmark) => {
+  return (
+    await db(table).where({ id }).update(updatedBookmark).returning('*')
+  )[0];
+};
+
 exports.deleteBookmark = async (db, id) => {
   return (await db(table).where({ id }).delete().returning('*'))[0];
 };

@@ -6,12 +6,15 @@ const {
   deleteBookmark,
   addBookmark,
   getBookmark,
-  checkData
+  updateBookmark,
+  checkData,
+  checkUpdatedData
 } = require('../controllers/bookmarksController');
 
 router.get('/', validateAPIKey, getBookmarks);
 router.get('/:id', validateAPIKey, getBookmark);
 router.post('/', validateAPIKey, checkData, addBookmark);
+router.patch('/:id', validateAPIKey, checkUpdatedData, updateBookmark);
 router.delete('/:id', validateAPIKey, deleteBookmark);
 
 module.exports = router;

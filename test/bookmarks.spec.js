@@ -79,6 +79,30 @@ describe('Articles Endpoints', function () {
         });
     });
 
+    it('Updates an article responding with 204 and the updated bookmark', () => {
+      return supertest(app)
+        .patch('/bookmarks/1')
+        .set('x-api-key', process.env.API_KEY)
+        .send({
+          title: 'Updated Bookmark Title',
+          url: 'https://www.updatedurl.com',
+          description: 'Updated Description',
+          rating: 3
+        })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).to.be.an('object');
+          expect(body).to.haveOwnProperty('updatedBookmark');
+          return expect(body.updatedBookmark).to.eql({
+            id: 1,
+            title: 'Updated Bookmark Title',
+            url: 'https://www.updatedurl.com',
+            description: 'Updated Description',
+            rating: 3
+          });
+        });
+    });
+
     it('Deletes an article responding with 200 and deleted bookmark', () => {
       return supertest(app)
         .delete('/bookmarks/1')
@@ -107,12 +131,12 @@ describe('Articles Endpoints', function () {
         });
     });
 
-    it('@GET /bookmarks responds 404 status code with message', () => {
+    it('@GET /bookmarks/id responds 404 status code with message', () => {
       return supertest(app)
         .get('/bookmarks/1039401929')
         .set('x-api-key', process.env.API_KEY)
         .expect('Content-Type', /json/)
-        .expect(404)
+        .expect(400)
         .then(({ body }) => {
           expect(body).to.be.an('object');
           expect(body).to.not.haveOwnProperty('bookmark');
